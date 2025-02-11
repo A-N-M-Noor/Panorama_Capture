@@ -85,12 +85,48 @@ def overlayAng(img, frameSz = (640, 480), offset = 0, rng = (0, 180)):
             lineV(_img, xp, h*0.9+bh, 2)
     return _img
 
+def crop(img):
+    stitched_img = cv2.copyMakeBorder(img, 10, 10, 10, 10, cv2.BORDER_CONSTANT, (0,0,0))
+
+    gray = cv2.cvtColor(stitched_img, cv2.COLOR_BGR2GRAY)
+    thresh_img = cv2.threshold(gray, 0, 255 , cv2.THRESH_BINARY)[1]
+
+    contours, _ = cv2.findContours(thresh_img.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    areaOI = max(contours, key=cv2.contourArea)
+
+    mask = np.zeros(thresh_img.shape, dtype="uint8")
+    x, y, w, h = cv2.boundingRect(areaOI)
+    cv2.rectangle(mask, (x,y), (x + w, y + h), 255, -1)
+
+    minRectangle = mask.copy()
+    sub = mask.copy()
+
+    while cv2.countNonZero(sub) > 0:
+        minRectangle = cv2.erode(minRectangle, None)
+        sub = cv2.subtract(minRectangle, thresh_img)
+
+
+    contours, _ = cv2.findContours(minRectangle.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    areaOI = max(contours, key=cv2.contourArea)
+
+    x, y, w, h = cv2.boundingRect(areaOI)
+
+    stitched_img = stitched_img[y:y + h, x:x + w]
+
+    return stitched_img
+
 if(__name__ == "__main__"):
     img = cv2.imread("panorama.jpg")
     if(img is None):
         print("No image")
         exit()
     
+    img = crop(img)
+
+    cv2.imshow('crop', img)
+
     img = overlayScale(img)
     img = overlayAng(img, offset=-90)
     cv2.imshow('overlay', img)
