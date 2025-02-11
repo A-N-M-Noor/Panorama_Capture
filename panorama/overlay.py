@@ -89,7 +89,7 @@ def crop(img):
     stitched_img = cv2.copyMakeBorder(img, 10, 10, 10, 10, cv2.BORDER_CONSTANT, (0,0,0))
 
     gray = cv2.cvtColor(stitched_img, cv2.COLOR_BGR2GRAY)
-    thresh_img = cv2.threshold(gray, 0, 255 , cv2.THRESH_BINARY)[1]
+    _, thresh_img = cv2.threshold(gray, 0, 255 , cv2.THRESH_BINARY)
 
     contours, _ = cv2.findContours(thresh_img.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
