@@ -33,10 +33,10 @@ def connectSer():
     return None
 
 
-def createPanorama():
+def createPanorama(ser):
     cap = cv2.VideoCapture(2)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 960)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+    # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 960)
+    # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
     if not cap.isOpened():
         print("Error: Could not open camera.")
@@ -46,6 +46,7 @@ def createPanorama():
     images = []
     ang = 0
     angStep = 180 // imCount
+    time.sleep(2)
     ser.write(f"{180-ang}\n".encode())
 
     while True:
@@ -58,6 +59,7 @@ def createPanorama():
             line = ser.readline().decode('utf-8').strip()
             print(f"[{time.time():.4f}] Received: {line}")
             if line == "done":
+                print("got")
                 images.append(frame)
                 ang += angStep
                 ser.write(f"{180-ang}\n".encode())
@@ -90,7 +92,7 @@ if(__name__ == "__main__"):
         print("Could not connect to serial port.")
         exit()
 
-    panorama = createPanorama()
+    panorama = createPanorama(ser)
     if(panorama is None):
         print("Error: Could not create panorama.")
         exit()

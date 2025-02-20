@@ -3,7 +3,7 @@
 
 Servo s;
 
-int target = 0, current = 90;
+int target = 0, current = 0;
 int angSpd = 1;
 int angDel = 20;
 int stabilizeDel = 500;
